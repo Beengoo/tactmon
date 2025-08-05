@@ -1,5 +1,5 @@
 pkgname=tactmon
-pkgver=1.0
+pkgver=1.1
 pkgrel=1
 pkgdesc="Simple realtime beat detector using aubio and pipewire"
 arch=('x86_64')

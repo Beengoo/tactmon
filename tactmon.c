@@ -179,7 +179,9 @@ int main(int argc, char **argv) {
     tm.no_termclear = false;
     tm.no_metronome = false;
     tm.frame_index = 0;
-
+    
+    
+    char_t detection_mode[32] = "default";
 
     for (int i = 1; i < argc; i++) {
         if (strcmp(argv[i], "--input-source=stdin") == 0) {
@@ -188,12 +190,15 @@ int main(int argc, char **argv) {
             tm.json = true;
         } else if (strcmp(argv[i], "--no-clear") == 0) {
             tm.no_termclear = true;
-        }else if (strcmp(argv[i], "--no-metronome") == 0){
+        } else if (strcmp(argv[i], "--no-metronome") == 0) {
             tm.no_metronome = true;
+        } else if (strncmp(argv[i], "--tempo-method=", 15) == 0) {
+            strncpy((char *)detection_mode, argv[i] + 15, sizeof(detection_mode) - 1);
+            detection_mode[sizeof(detection_mode) - 1] = '\0';
         } else if (strcmp(argv[i], "--help") == 0) {
-            printf("Usage: %s [--json] [--no-clear] [--no-metronome]\n", argv[0]);
+            printf("Usage: %s [--json] [--no-clear] [--no-metronome] [--tempo-method=default|complex|...] \n", argv[0]);
             return 0;
-        }
+        }    
     }
 
     signal(SIGINT, handle_sigint);
@@ -203,7 +208,13 @@ int main(int argc, char **argv) {
         pw_init(&argc, &argv);
         init_pipewire_sink(&tm);
 
-        tm.tempo = new_aubio_tempo("default", tm.buffer_size, tm.hop_size, tm.sample_rate);
+        tm.tempo = new_aubio_tempo(detection_mode, tm.buffer_size, tm.hop_size, tm.sample_rate);
+        if (!tm.tempo) {
+            printf("[X] Unable to initialize aubio tempo\n");
+            printf("[X] Did you spell --tempo-method wrong?\n");
+            cleanup_tmproc(&tm);
+            return -1;
+        }
         tm.tempo_in = new_fvec(tm.hop_size);
         tm.tempo_out = new_fvec(2);
 
