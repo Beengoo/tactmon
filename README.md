@@ -1,4 +1,4 @@
-# tactmon - Simple realtime beat detector using [aubio](https://aubio.org/)
+# tactmon - Simple realtime beat detector for Linux using [aubio](https://aubio.org/)
 
 ---
 
@@ -17,6 +17,11 @@ From pipewire sink
 tactmon
 ```
 tactmon will create pipewire sink which need to connect to source of music!
+
+Change tempo detection method and output json format
+```sh 
+tactmon --json --tempo-method=complexdomain
+```
 Also see `tactmon --help` for more options
 ## Installation
 
